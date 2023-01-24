@@ -46,13 +46,6 @@ if (Serial.available()) {
 }
 
 
-
-
-
-
-
-
-
 void demoone() {
   //Activate motor A
   digitalWrite(in1, LOW);
