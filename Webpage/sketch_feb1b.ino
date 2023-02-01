@@ -1,88 +1,101 @@
-#ifdef ESP8266
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#elif defined(ESP32)
-#include <WiFi.h>
-#include <ESPmDNS.h>
-#else
-#error "Board not found"
-#endif
+#include <ESP8266WebServer.h>
 
+/*Put WiFi SSID & Password*/
+const char* ssid = "Taha";   // Enter SSID here
+const char* password = "taha@1379"; // Enter Password here
 
-#define LED1 15
-#define LED2 12
+ESP8266WebServer server(80);
 
-char webpage[] PROGMEM = R"=====(
+bool LEDstatus = LOW;
 
-<!DOCTYPE html>
-<html>
-<body>
+void setup() {
+  Serial.begin(9600);
+  delay(100);
+  pinMode(D4, OUTPUT);
 
-<center>
-<h1>My Home Automation</h1>
+  Serial.println("Connecting to ");
+  Serial.println(ssid);
 
-<h3> LED 1 </h3>
-<button onclick="window.location = 'http://'+location.hostname+'/led1/on'">On</button><button onclick="window.location = 'http://'+location.hostname+'/led1/off'">Off</button>
-<h3> LED 2 </h3>
-<button onclick="window.location = 'http://'+location.hostname+'/led2/on'">On</button><button onclick="window.location = 'http://'+location.hostname+'/led2/off'">Off</button>
+  //connect to your local wi-fi network
+  WiFi.begin(ssid, password);
 
-</center>
-</body>
-</html>
-
-)=====";
-
-// ipaddress/led1/on
-//ipaddress/led1/off
-
-// ipaddress/led2/on
-//ipaddress/led2/off
-#include <ESPAsyncWebServer.h>
-
-AsyncWebServer server(80); // server port 80
-
-void notFound(AsyncWebServerRequest *request)
-{
-  request->send(404, "text/plain", "Page Not found");
-}
-
-void setup(void)
-{
-  
-  Serial.begin(115200);
-  pinMode(LED1,OUTPUT);
-  pinMode(LED2,OUTPUT);
-  
-  WiFi.softAP("techiesms", "");
-  Serial.println("softap");
-  Serial.println("");
-  Serial.println(WiFi.softAPIP());
-
-
-  if (MDNS.begin("ESP")) { //esp.local/
-    Serial.println("MDNS responder started");
+  //check NodeMCU is connected to Wi-fi network
+  while (WiFi.status() != WL_CONNECTED) {
+  delay(1000);
+  Serial.print(".");
   }
+  Serial.println("");
+  Serial.println("WiFi connected..!");
+  Serial.print("Got IP: ");  
+  Serial.println(WiFi.localIP());
 
+  server.on("/", handle_OnConnect);
+  server.on("/ledon", handle_ledon);
+  server.on("/ledoff", handle_ledoff);
+  server.onNotFound(handle_NotFound);
 
-
-  server.on("/", [](AsyncWebServerRequest * request)
-  { 
-   
-  request->send_P(200, "text/html", webpage);
-  });
-
-   server.on("/led1/on", HTTP_GET, [](AsyncWebServerRequest * request)
-  { 
-    digitalWrite(LED1,HIGH);
-  request->send_P(200, "text/html", webpage);
-  });
-
-  server.onNotFound(notFound);
-
-  server.begin();  // it will start webserver
+  server.begin();
+  Serial.println("HTTP Server Started");
+}
+void loop() {
+  server.handleClient();
+  
+  if(LEDstatus)
+  {
+    digitalWrite(D4, HIGH);}
+  else
+  {
+    digitalWrite(D4, LOW);}
 }
 
+void handle_OnConnect() {
+  LEDstatus = LOW;
+  Serial.println("LED: OFF");
+  server.send(200, "text/html", updateWebpage(LEDstatus)); 
+}
 
-void loop(void)
-{
+void handle_ledon() {
+  LEDstatus = HIGH;
+  Serial.println("LED: ON");
+  server.send(200, "text/html", updateWebpage(LEDstatus)); 
+}
+
+void handle_ledoff() {
+  LEDstatus = LOW;
+  Serial.println("LED: OFF");
+  server.send(200, "text/html", updateWebpage(LEDstatus)); 
+}
+
+void handle_NotFound(){
+  server.send(404, "text/plain", "Not found");
+}
+
+String updateWebpage(uint8_t LEDstatus){
+  String ptr = "<!DOCTYPE html> <html>\n";
+  ptr +="<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
+  ptr +="<title>LED Control</title>\n";
+  ptr +="<style>html {font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
+  ptr +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
+  ptr +=".button {display: block;width: 80px;background-color: #1abc9c;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n";
+  ptr +=".button-on {background-color: #3498db;}\n";
+  ptr +=".button-on:active {background-color: #3498db;}\n";
+  ptr +=".button-off {background-color: #34495e;}\n";
+  ptr +=".button-off:active {background-color: #2c3e50;}\n";
+  ptr +="p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
+  ptr +="</style>\n";
+  ptr +="</head>\n";
+  ptr +="<body>\n";
+  ptr +="<h1>ESP8266 Web Server</h1>\n";
+  ptr +="<h3>Using Station(STA) Mode</h3>\n";
+  
+   if(LEDstatus){
+    ptr +="<p>BLUE LED: ON</p><a class=\"button button-off\" href=\"/ledoff\">OFF</a>\n";
+   }else{
+    ptr +="<p>BLUE LED: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>\n";
+   }
+
+  ptr +="</body>\n";
+  ptr +="</html>\n";
+  return ptr;
 }
