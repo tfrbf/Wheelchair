@@ -6,30 +6,30 @@
 
 
 //----------------------------------------------Global Variables
-int ENA = 10;                          // to EnA of L298
-int IN1 = 9;                           // to IN1 of L298
-int IN2 = 8;                           // to IN2 of L298
-int ENB = 11;                          // to EnB of L298
-int IN3 = 13;                          // to IN3 of L298
-int IN4 = 12;                          // to IN4 of L298
-const byte ChA = 2;                    // to ENA (OutA / ChA) of First Encoder
-const byte ChB = 3;                    // to ENB (OutA / ChA) of First Encoder
-const byte ChA_2 = 4;                  // to ENA (OutA / ChA) of Seconde Encoder
-const byte ChB_2 = 5;                  // to ENB (OutA / ChA) of Seconde Encoder
+int ENA = 10;                          
+int IN1 = 9;                           
+int IN2 = 8;                           
+int ENB = 11;                          
+int IN3 = 13;                          
+int IN4 = 12;                          
+const byte ChA = 2;                    
+const byte ChB = 3;                    
+const byte ChA_2 = 4;                  
+const byte ChB_2 = 5;                  
 volatile unsigned long _1RevDuration;  // Duration of 1 Revolution
 volatile unsigned long _1RevDuration_2;
-float rpm = 0;                     // Motor Speed
-float rpm_2 = 0;                   // Second Motor Speed
-float pwm;                         // PWM to L298
-float pwm_2;                       // Second PWM
+float rpm = 0;                     
+float rpm_2 = 0;                   
+float pwm;                        
+float pwm_2;                       
 long counter = 0;                  // Counter for Sinusoidal PWM Generation
 long counter_2 = 0;                // Counter for Second Sinusoidal PWM Generation
 volatile int feedbackDirection;    // Direction Detected by Encoder
 volatile int feedbackDirection_2;  //// Direction Detected by Second Encoder
 
 enum desiredDirection {  // Desired Direction
-  CW = 0,                // Clockwise
-  CCW = 1                // Counter Clockwise
+  CW = 0,                
+  CCW = 1                
 };
 
 void setPWM(float outputPWM);  // Apply PWM to motor (input between 0-100)
@@ -38,7 +38,6 @@ void setDirection(desiredDirection dir);  // Select Direction of Rotation
 void setDirection_2(desiredDirection dir_2);
 
 
-//---------------------------------------------------SETUP
 void setup() {
   Serial.begin(9600);
   pinMode(ENA, OUTPUT);
@@ -54,47 +53,30 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ChA_2), checkDirection, RISING);
 }
 
-//----------------------------------------------------LOOP
+
 void loop() {
-
-
 
   pwm = 80.0f * sin(2.0f * pi * counter / 100.0f);
   pwm_2 = 80.0f * sin(2.0f * pi * counter / 100.0f);
   counter += 1;
   counter_2 += 1;
-  // if (pwm > 0)
-  //   setDirection(CW);
-  // else
-  //   setDirection(CCW);
-  // setPWM(fabs(pwm));
 
-  // if (pwm_2 > 0)
-  //   setDirection(CW);
-  // else
-  //   setDirection(CCW);
-  // setPWM(fabs(pwm_2));
-
-  //delay(100);
-  _1RevDuration = pulseIn(ChA, LOW, 10000) * EncoderCPR * 2;  // Calculating the Duration of a Revolution in micro seconds
+  _1RevDuration = pulseIn(ChA, LOW, 10000) * EncoderCPR * 2; 
+   // Calculating the Duration of a Revolution in micro seconds
   if (_1RevDuration == 0)  rpm = 0;                                   // Avoiding from Singularity Problem
-    
-  else
-  rpm = feedbackDirection * _60secInMicrisec / ((float)_1RevDuration * GearRatio);  // Calculating Motor RPM
-  Serial.print("Right Motor RPM: ");
+  else rpm = feedbackDirection * _60secInMicrisec / ((float)_1RevDuration * GearRatio);
+  Serial.print("\t Right Motor RPM: ");
   Serial.print(rpm);
   Serial.print("   \n");
-  //Serial.println(pwm);
-
+  
   _1RevDuration_2 = pulseIn(ChA_2, LOW, 10000) * EncoderCPR * 2;  // Calculating the Duration of a Revolution in micro seconds
   if (_1RevDuration_2 == 0)  rpm_2 = 0;                                     // Avoiding from Singularity Problem
-
-  else
-  rpm_2 = feedbackDirection_2 * _60secInMicrisec / ((float)_1RevDuration_2 * GearRatio);  // Calculating Motor RPM
+  else rpm_2 = feedbackDirection_2 * _60secInMicrisec / ((float)_1RevDuration_2 * GearRatio);
   Serial.print("Left Motor RPM: ");
   Serial.print(rpm_2);
   Serial.print("   ");
-  //Serial.println(pwm_2);
+
+  delay(500);
 }
 
 
