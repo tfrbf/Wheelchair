@@ -1,0 +1,206 @@
+// Arduino Obstacle Avoidance + Voice Control Robot
+// Created by DIY Builder
+//Contact me here https://www.instagram.com/diy.builder/
+//You need to install the AFMotor and NewPing Libraries before uplodaing the sketch
+#include "string.h"
+#include "SRF05.h"
+#include <AFMotor.h>
+int Speed;
+bool Status;
+int distance;
+int led_rate;
+char blth;
+//#include <NewPing.h>
+//#include<Servo.h>
+//#define TRIGGER_PIN A1
+#define trigger 12
+//#define ECHO_PIN A0
+#define echo 13
+#define MAX_DISTANCE 300
+#define IR A5
+#define l_motor 9  // ENA
+#define l_motor_in1 7
+#define l_motor_in2 6
+#define r_motor 3  // ENB
+#define r_motor_in3 4
+#define r_motor_in4 5
+
+
+AF_DCMotor motor1(1, MOTOR12_1KHZ);
+AF_DCMotor motor2(2, MOTOR12_1KHZ);
+AF_DCMotor motor3(3, MOTOR34_1KHZ);
+AF_DCMotor motor4(4, MOTOR34_1KHZ);
+
+
+SRF05 SRF(trigger, echo);
+//NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+
+//Servo myservo;
+
+String voice;
+
+void setup() {
+  Serial.begin(9600);
+  //myservo.attach(10);
+  //myservo.write(90);
+  pinMode(IR, INPUT);
+  if (Serial.available() > 0)
+    Serial.print("\tBluetooth Connected Seccessfully.\a");
+  SRF.setCorrectionFactor(1.035);
+}
+
+void loop() {
+  //int distance = sonar.ping_cm();
+  //int IR1 = digitalRead(IR);
+  //Serial.println(IR1);
+
+  if (Serial.available() > 0) {
+    voice = "";
+    delay(2);
+    voice = Serial.readString();
+    delay(2);
+    Serial.println(voice);
+    blth = Serial.read();
+
+
+
+   if (voice == "turn left") {
+      left();
+    } else if (voice == "left") {
+      left();
+    } else if (voice == "turn right") {
+      right();
+    } else if (voice == "right") {
+      right();
+    }
+  }
+  while (voice == "move forward") {
+    forward();
+  }
+  while (voice == "move backward") {
+    backward();
+  }
+}
+
+if (blth == 'F')
+  forward();
+
+if (blth == 'L')
+  right();
+
+if (blth == 'R')
+  left();
+
+if (blth == 'S')
+  Stop();
+}
+
+
+void forward() {
+  //int distance = sonar.ping_cm();
+  distance = SRF.getCentimeter();
+  if (distance < 10) {
+    Stop();
+    voice = "";
+  } else {
+    digitalWrite(l_motor_in1, LOW);
+    digitalWrite(l_motor_in2, HIGH);
+    analogWrite(l_motor, 255);
+
+    digitalWrite(r_motor_in3, LOW);
+    digitalWrite(r_motor_in4, HIGH);
+    analogWrite(r_motor, 255);
+    // motor1.setSpeed(255);
+    // motor1.run(FORWARD);
+    // motor2.setSpeed(255);
+    // motor2.run(FORWARD);
+    // motor3.setSpeed(255);
+    //  motor3.run(FORWARD);
+    // motor4.setSpeed(255);
+    //motor4.run(FORWARD);
+    //}
+    //}
+    //void backward() {
+    // int IR_Sensor = digitalRead(IR);
+    // if(IR_Sensor == 0) {
+    //    Stop();
+    //   voice="";
+    //}else {
+    // motor1.setSpeed(255);
+    //  motor1.run(BACKWARD);
+    // motor2.setSpeed(255);
+    //motor2.run(BACKWARD);
+    // motor3.setSpeed(255);
+    // motor3.run(BACKWARD);
+    //motor4.setSpeed(255);
+    //motor4.run(BACKWARD);
+
+    //}
+    //}
+    void left() {
+      digitalWrite(l_motor_in1, LOW);
+      digitalWrite(l_motor_in2, HIGH);
+      analogWrite(l_motor, 255);
+
+      digitalWrite(r_motor_in3, HIGH);
+      digitalWrite(r_motor_in4, LOW);
+      analogWrite(r_motor, 255);
+      // myservo.write(180);
+      // delay(500);
+      // myservo.write(90);
+      // delay(500);
+      //  motor1.run(BACKWARD);
+      // motor1.setSpeed(255);
+      //motor2.run(BACKWARD);
+      // motor2.setSpeed(255);
+      // motor3.run(FORWARD);
+      // motor3.setSpeed(255);
+      // motor4.run(FORWARD);
+      // motor4.setSpeed(255);
+      // delay(700);
+      // motor1.run(RELEASE);
+      // motor2.run(RELEASE);
+      // motor3.run(RELEASE);
+      // motor4.run(RELEASE);
+    }
+
+    void right() {
+      digitalWrite(l_motor_in1, HIGH);
+      digitalWrite(l_motor_in2, LOW);
+      analogWrite(l_motor, 255);
+
+      digitalWrite(r_motor_in3, LOW);
+      digitalWrite(r_motor_in4, HIGH);
+      analogWrite(r_motor, 255);
+      // myservo.write(0);
+      // delay(500);
+      // myservo.write(90);
+      // delay(500);
+      //  motor1.run(FORWARD);
+      // motor1.setSpeed(255);
+      // motor2.run(FORWARD);
+      // motor2.setSpeed(255);
+      //  motor3.run(BACKWARD);
+      //motor3.setSpeed(255);
+      //motor4.run(BACKWARD);
+      // motor4.setSpeed(255);
+      // delay(700);
+      // motor1.run(RELEASE);
+      // motor2.run(RELEASE);
+      // motor3.run(RELEASE);
+      // motor4.run(RELEASE);
+    }
+
+    void Stop() {
+      digitalWrite(l_motor_in1, HIGH);
+      digitalWrite(l_motor_in2, LOW);
+      analogWrite(l_motor, 0);
+
+      digitalWrite(r_motor_in3, HIGH);
+      digitalWrite(r_motor_in4, LOW);
+      analogWrite(r_motor, 0);
+      // motor1.run(RELEASE);
+      // motor2.run(RELEASE);
+      //  motor3.run(RELEASE);
+      // motor4.run(RELEASE);
+    }
