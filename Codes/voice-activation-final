@@ -52,7 +52,7 @@ void loop() {
   if ((voice == "forward") || (voice == "go forward"))
     forward();
 
-  if ((voice == "backward") || (voice == "go backward"))
+  if ((voice == "dolly"))
     backward();
 
   if (voice == "low speed")
@@ -69,7 +69,7 @@ void loop() {
 }
 
 
-void forward() {
+void right() {
   digitalWrite(l_motor_in1, LOW);
   digitalWrite(l_motor_in2, HIGH);
   analogWrite(l_motor, Speed);
@@ -79,7 +79,7 @@ void forward() {
   analogWrite(r_motor, Speed);
 }
 
-void backward() {
+void left() {
   digitalWrite(l_motor_in1, HIGH);
   digitalWrite(l_motor_in2, LOW);
   analogWrite(l_motor, Speed);
@@ -89,7 +89,7 @@ void backward() {
   analogWrite(r_motor, Speed);
 }
 
-void left() {
+void backward() {
   digitalWrite(l_motor_in1, LOW);
   digitalWrite(l_motor_in2, HIGH);
   analogWrite(l_motor, Speed);
@@ -99,7 +99,7 @@ void left() {
   analogWrite(r_motor, Speed);
 }
 
-void right() {
+void forward() {
   digitalWrite(l_motor_in1, HIGH);
   digitalWrite(l_motor_in2, LOW);
   analogWrite(l_motor, Speed);
