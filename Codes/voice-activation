@@ -61,39 +61,41 @@ void loop() {
     delay(2);
     Serial.println(voice);
     blth = Serial.read();
-
-
-
-   if (voice == "turn left") {
-      left();
-    } else if (voice == "left") {
-      left();
-    } else if (voice == "turn right") {
-      right();
-    } else if (voice == "right") {
-      right();
-    }
   }
+
+
+  if (voice == "turn left")
+    left();
+  else if (voice == "left")
+    left();
+  else if (voice == "turn right")
+    right();
+  else if (voice == "right")
+    right();
+
+
   while (voice == "move forward") {
     forward();
   }
-  while (voice == "move backward") {
-    backward();
-  }
+ // while (voice == "move backward") {
+   // backward();
+  //}
+
+  if (blth == 'F')
+    forward();
+
+  if (blth == 'L')
+    right();
+
+  if (blth == 'R')
+    left();
+
+  if (blth == 'S')
+    Stop();
 }
 
-if (blth == 'F')
-  forward();
 
-if (blth == 'L')
-  right();
 
-if (blth == 'R')
-  left();
-
-if (blth == 'S')
-  Stop();
-}
 
 
 void forward() {
@@ -102,7 +104,8 @@ void forward() {
   if (distance < 10) {
     Stop();
     voice = "";
-  } else {
+  } 
+  else {
     digitalWrite(l_motor_in1, LOW);
     digitalWrite(l_motor_in2, HIGH);
     analogWrite(l_motor, 255);
@@ -137,7 +140,9 @@ void forward() {
 
     //}
     //}
-    void left() {
+  }
+}
+void left() {
       digitalWrite(l_motor_in1, LOW);
       digitalWrite(l_motor_in2, HIGH);
       analogWrite(l_motor, 255);
@@ -162,9 +167,9 @@ void forward() {
       // motor2.run(RELEASE);
       // motor3.run(RELEASE);
       // motor4.run(RELEASE);
-    }
+}
 
-    void right() {
+void right() {
       digitalWrite(l_motor_in1, HIGH);
       digitalWrite(l_motor_in2, LOW);
       analogWrite(l_motor, 255);
@@ -189,9 +194,9 @@ void forward() {
       // motor2.run(RELEASE);
       // motor3.run(RELEASE);
       // motor4.run(RELEASE);
-    }
+}
 
-    void Stop() {
+void Stop() {
       digitalWrite(l_motor_in1, HIGH);
       digitalWrite(l_motor_in2, LOW);
       analogWrite(l_motor, 0);
@@ -203,4 +208,4 @@ void forward() {
       // motor2.run(RELEASE);
       //  motor3.run(RELEASE);
       // motor4.run(RELEASE);
-    }
+}
