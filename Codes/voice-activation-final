@@ -12,11 +12,11 @@ String voice;
 #define MAX_DISTANCE 300
 #define IR A5
 #define l_motor 9  // ENA
-#define l_motor_in1 7
+#define l_motor_in1 5
 #define l_motor_in2 6
 #define r_motor 10  // ENB
 #define r_motor_in3 4
-#define r_motor_in4 5
+#define r_motor_in4 7
 
 AF_DCMotor motor1(1, MOTOR12_1KHZ);
 AF_DCMotor motor2(2, MOTOR12_1KHZ);
